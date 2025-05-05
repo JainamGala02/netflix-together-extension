@@ -1,0 +1,411 @@
+/* content.css - Enhanced styles for the Netflix Together overlay */
+#netflix-together-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+/* Control bar */
+.control-bar {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: rgba(0, 0, 0, 0.8); /* Increased opacity for better visibility */
+  border-radius: 20px;
+  padding: 10px 15px; /* Larger padding for better touch targets */
+  display: flex;
+  align-items: center;
+  gap: 12px; /* Increased spacing */
+  pointer-events: auto;
+  z-index: 10000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5); /* Added shadow for better visibility */
+}
+
+.control-button {
+  color: white;
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 36px; /* Larger size */
+  height: 36px; /* Larger size */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px; /* Larger icons */
+  border-radius: 50%;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.control-button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.control-button:active {
+  transform: scale(0.95);
+}
+
+.room-code {
+  color: white;
+  font-size: 14px; /* Slightly larger */
+  padding: 0 8px;
+  border-left: 1px solid rgba(255, 255, 255, 0.3);
+  font-weight: bold; /* Added for better visibility */
+}
+
+/* Video containers */
+.video-container {
+  position: absolute;
+  top: 60px;
+  right: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: auto;
+  z-index: 10000;
+}
+
+.video-wrapper {
+  width: 200px; /* Slightly larger */
+  height: 150px; /* Slightly larger */
+  background-color: #000;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  border: 2px solid #333;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5); /* Added shadow for better visibility */
+}
+
+.video-wrapper video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background-color: #222;
+}
+
+.video-label {
+  position: absolute;
+  bottom: 5px;
+  left: 5px;
+  background-color: rgba(0, 0, 0, 0.7); /* More opaque */
+  color: white;
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-weight: bold; /* Added for better visibility */
+}
+
+.camera-off-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.8); /* More opaque */
+  color: white;
+  font-size: 24px;
+}
+
+.camera-off-indicator::after {
+  content: "Camera Off";
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+/* Chat container */
+.chat-container {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  width: 300px;
+  height: 400px;
+  background-color: rgba(0, 0, 0, 0.85); /* More opaque */
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  z-index: 10000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.7); /* Added shadow for better visibility */
+  opacity: 1;
+}
+
+.chat-container.hidden {
+  transform: translateX(310px);
+  opacity: 0;
+}
+
+.chat-header {
+  padding: 10px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Added border */
+}
+
+.chat-header h3 {
+  margin: 0;
+  color: white;
+  font-size: 16px;
+}
+
+.messages-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+/* Custom scrollbar for Webkit browsers */
+.messages-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.messages-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.messages-container::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+.chat-message {
+  max-width: 80%;
+  padding: 8px 10px;
+  border-radius: 10px;
+  position: relative;
+  word-wrap: break-word; /* Ensure long words don't overflow */
+}
+
+.own-message {
+  background-color: #0084ff;
+  color: white;
+  align-self: flex-end;
+  border-bottom-right-radius: 2px; /* Chat bubble style */
+}
+
+.partner-message {
+  background-color: #333;
+  color: white;
+  align-self: flex-start;
+  border-bottom-left-radius: 2px; /* Chat bubble style */
+}
+
+.system-message {
+  align-self: center;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #aaa;
+  padding: 5px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  margin: 5px 0;
+  text-align: center;
+  max-width: 90%;
+}
+
+.message-sender {
+  font-size: 11px;
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+.message-content {
+  line-height: 1.3; /* Improved readability */
+}
+
+.message-time {
+  position: absolute;
+  bottom: 2px;
+  right: 6px;
+  font-size: 9px;
+  opacity: 0.7;
+}
+
+.chat-input {
+  display: flex;
+  padding: 10px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+.chat-input input {
+  flex: 1;
+  background-color: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 15px;
+  padding: 8px 12px;
+  color: white;
+  outline: none;
+}
+
+.chat-input input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.chat-input input:focus {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+.chat-input button {
+  background-color: #0084ff;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 34px; /* Slightly larger */
+  height: 34px; /* Slightly larger */
+  margin-left: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.chat-input button:hover {
+  background-color: #0078e7;
+}
+
+/* Error message */
+.error-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(226, 54, 54, 0.9);
+  color: white;
+  padding: 15px 20px;
+  border-radius: 8px;
+  max-width: 400px;
+  text-align: center;
+  z-index: 10001;
+  pointer-events: auto;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+/* Recovery and debug buttons */
+#netflix-together-recovery {
+  position: fixed;
+  top: 50px;
+  left: 10px;
+  background-color: #e50914;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  z-index: 10001;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+#netflix-together-debug {
+  position: fixed;
+  top: 100px;
+  left: 10px;
+  background-color: #333;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  z-index: 10001;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Connection status indicator */
+.connection-status {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 10000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #ccc;
+}
+
+.status-dot.connected {
+  background-color: #4CAF50;
+}
+
+.status-dot.connecting {
+  background-color: #FFC107;
+  animation: blink 1s infinite;
+}
+
+.status-dot.disconnected {
+  background-color: #F44336;
+}
+
+/* Animation keyframes */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Added styles for visible notification messages */
+.notification {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  z-index: 10001;
+  font-size: 14px;
+  text-align: center;
+  animation: fadeInOut 3s forwards;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translate(-50%, -20px); }
+  10% { opacity: 1; transform: translate(-50%, 0); }
+  90% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -20px); }
+}
+
+/* Media query for smaller screens */
+@media (max-width: 768px) {
+  .video-wrapper {
+    width: 160px;
+    height: 120px;
+  }
+  
+  .chat-container {
+    width: 260px;
+    height: 350px;
+  }
+}

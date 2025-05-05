@@ -1,0 +1,51 @@
+{
+    "manifest_version": 3,
+    "name": "Netflix Together",
+    "version": "1.0",
+    "description": "Watch Netflix, YouTube and other streaming services together with video chat",
+    "permissions": [
+      "tabs",
+      "storage",
+      "activeTab",
+      "scripting"
+    ],
+    "host_permissions": [
+      "https://*.netflix.com/*",
+      "https://*.youtube.com/*",
+      "https://*.hulu.com/*",
+      "https://*.disneyplus.com/*",
+      "https://*.hbomax.com/*",
+      "https://*.amazon.com/*"
+    ],
+    "background": {
+      "service_worker": "background.js"
+    },
+    "action": {
+      "default_popup": "popup.html",
+      "default_icon": {
+        "16": "images/icon16.png",
+        "48": "images/icon48.png",
+        "128": "images/icon128.png"
+      }
+    },
+    "content_scripts": [
+      {
+        "matches": [
+          "https://*.netflix.com/*",
+          "https://*.youtube.com/*",
+          "https://*.hulu.com/*",
+          "https://*.disneyplus.com/*", 
+          "https://*.hbomax.com/*",
+          "https://*.amazon.com/*"
+        ],
+        "js": ["content.js"],
+        "css": ["content.css"]
+      }
+    ],
+    "web_accessible_resources": [
+      {
+        "resources": ["socket.io.js", "page-script.js", "overlay.html", "overlay.js", "overlay.css", "images/*"],
+        "matches": ["<all_urls>"]
+      }
+    ]
+  }

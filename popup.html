@@ -1,0 +1,214 @@
+<!-- This is the popup that appears when clicking the extension icon -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Netflix Together</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+  <style>
+    body {
+      width: 300px;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #141414;
+      color: #fff;
+    }
+    
+    .header {
+      background-color: #e50914;
+      padding: 10px 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .header h1 {
+      margin: 0;
+      font-size: 16px;
+    }
+    
+    .content {
+      padding: 15px;
+    }
+    
+    .section {
+      margin-bottom: 20px;
+    }
+    
+    .section-title {
+      font-size: 14px;
+      margin-bottom: 10px;
+      color: #ccc;
+    }
+    
+    .card {
+      background-color: #333;
+      border-radius: 5px;
+      padding: 15px;
+    }
+    
+    .session-info {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    
+    .room-code {
+      font-size: 24px;
+      font-weight: bold;
+      color: #e50914;
+      margin: 10px 0;
+      letter-spacing: 2px;
+    }
+    
+    .status {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      font-size: 14px;
+    }
+    
+    .status.online {
+      color: #4CAF50;
+    }
+    
+    .status.offline {
+      color: #F44336;
+    }
+    
+    .action-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .button {
+      background-color: #e50914;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 10px;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background-color 0.2s;
+    }
+    
+    .button:hover {
+      background-color: #f40612;
+    }
+    
+    .button:disabled {
+      background-color: #5c5c5c;
+      cursor: not-allowed;
+    }
+    
+    .button.outline {
+      background-color: transparent;
+      border: 1px solid #e50914;
+      color: #e50914;
+    }
+    
+    .button.outline:hover {
+      background-color: rgba(229, 9, 20, 0.1);
+    }
+    
+    .join-session {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .join-session input {
+      flex: 1;
+      background-color: #454545;
+      border: 1px solid #555;
+      color: white;
+      padding: 10px;
+      border-radius: 4px;
+      outline: none;
+    }
+    
+    .join-session input:focus {
+      border-color: #e50914;
+    }
+    
+    .join-session button {
+      padding: 0 15px;
+    }
+    
+    .footer {
+      text-align: center;
+      font-size: 11px;
+      color: #aaa;
+      padding: 10px;
+      border-top: 1px solid #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>
+      <i class="fas fa-film"></i>
+      Netflix Together
+    </h1>
+  </div>
+  
+  <div class="content">
+    <div id="active-session" style="display: none;">
+      <div class="section">
+        <div class="card">
+          <div class="session-info">
+            <div class="section-title">CURRENT SESSION</div>
+            <div class="room-code" id="current-room-code">------</div>
+            <div id="partner-status" class="status offline">
+              <i class="fas fa-circle"></i>
+              <span>Waiting for partner</span>
+            </div>
+          </div>
+          <div class="action-buttons">
+            <button id="copy-code" class="button">
+              <i class="fas fa-copy"></i>
+              Copy Room Code
+            </button>
+            <button id="end-session" class="button outline">
+              <i class="fas fa-times-circle"></i>
+              End Session
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="no-active-session">
+      <div class="section">
+        <div class="section-title">START A NEW SESSION</div>
+        <div class="action-buttons">
+          <button id="create-session" class="button">
+            <i class="fas fa-plus-circle"></i>
+            Create New Session
+          </button>
+        </div>
+      </div>
+      
+      <div class="section">
+        <div class="section-title">JOIN EXISTING SESSION</div>
+        <div class="join-session">
+          <input type="text" id="room-code-input" placeholder="Enter Room Code" />
+          <button id="join-session" class="button">
+            <i class="fas fa-sign-in-alt"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="footer">
+    Netflix Together Extension v1.0
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>

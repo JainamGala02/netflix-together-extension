@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Socket.io Connection Test</title>
+  <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    h1 {
+      color: #333;
+    }
+    .result {
+      margin: 20px 0;
+      padding: 15px;
+      border-radius: 5px;
+    }
+    .success {
+      background-color: #d4edda;
+      border: 1px solid #c3e6cb;
+      color: #155724;
+    }
+    .error {
+      background-color: #f8d7da;
+      border: 1px solid #f5c6cb;
+      color: #721c24;
+    }
+    .pending {
+      background-color: #fff3cd;
+      border: 1px solid #ffeeba;
+      color: #856404;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #0069d9;
+    }
+    #logs {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .log-item {
+      margin-bottom: 5px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 5px;
+    }
+    .log-time {
+      color: #6c757d;
+      font-size: 0.8em;
+    }
+    .log-error {
+      color: #dc3545;
+    }
+    .log-success {
+      color: #28a745;
+    }
+  </style>
+</head>
+<body>
+  <h1>Socket.io Connection Test</h1>
+  <p>This page tests if your Socket.io server is accessible from your browser.</p>
+  
+  <div id="status" class="result pending">
+    Ready to test connection. Click the button below.
+  </div>
+  
+  <button id="testBtn">Test Connection</button>
+  
+  <div id="logs">
+    <div class="log-item">
+      <span class="log-time">[00:00:00]</span> Waiting for test to start...
+    </div>
+  </div>
+  
+  <script>
+    const statusDiv = document.getElementById('status');
+    const logsDiv = document.getElementById('logs');
+    const testBtn = document.getElementById('testBtn');
+    
+    function log(message, type = 'info') {
+      const now = new Date();
+      const timeStr = now.toTimeString().split(' ')[0];
+      
+      const logItem = document.createElement('div');
+      logItem.className = 'log-item';
+      
+      const logTime = document.createElement('span');
+      logTime.className = 'log-time';
+      logTime.textContent = `[${timeStr}] `;
+      
+      const logMessage = document.createElement('span');
+      if (type === 'error') {
+        logMessage.className = 'log-error';
+      } else if (type === 'success') {
+        logMessage.className = 'log-success';
+      }
+      logMessage.textContent = message;
+      
+      logItem.appendChild(logTime);
+      logItem.appendChild(logMessage);
+      logsDiv.appendChild(logItem);
+      
+      // Scroll to bottom
+      logsDiv.scrollTop = logsDiv.scrollHeight;
+    }
+    
+    testBtn.addEventListener('click', function() {
+      testConnection();
+    });
+    
+    function testConnection() {
+      testBtn.disabled = true;
+      statusDiv.className = 'result pending';
+      statusDiv.textContent = 'Testing connection...';
+      
+      log('Starting connection test to https://netflix-together-server.onrender.com');
+      
+      try {
+        log('Attempting to create Socket.io connection...');
+        
+        const socket = io('https://netflix-together-server.onrender.com', {
+          transports: ['websocket', 'polling'],
+          reconnection: true,
+          reconnectionAttempts: 3,
+          timeout: 5000
+        });
+        
+        socket.on('connect', function() {
+          log(`Connection successful! Socket ID: ${socket.id}`, 'success');
+          
+          statusDiv.className = 'result success';
+          statusDiv.innerHTML = '<strong>SUCCESS!</strong> Connected to the Socket.io server.';
+          
+          // Try to ping the server
+          log('Sending ping to server...');
+          socket.emit('debug-ping', function(response) {
+            log(`Received ping response: ${JSON.stringify(response)}`, 'success');
+          });
+          
+          // Disconnect after 5 seconds
+          setTimeout(function() {
+            socket.disconnect();
+            log('Test connection closed', 'info');
+            testBtn.disabled = false;
+          }, 5000);
+        });
+        
+        socket.on('connect_error', function(error) {
+          log(`Connection error: ${error.message}`, 'error');
+          
+          statusDiv.className = 'result error';
+          statusDiv.innerHTML = '<strong>ERROR!</strong> Failed to connect to the Socket.io server.<br>' +
+                               'Error: ' + error.message + '<br><br>' +
+                               'Possible solutions:<br>' +
+                               '1. Make sure your server is running<br>' +
+                               '2. Check if the server is running on port 3000<br>' +
+                               '3. Try accessing <a href="https://netflix-together-server.onrender.com" target="_blank">https://netflix-together-server.onrender.com</a> directly<br>' +
+                               '4. Check your firewall settings';
+          
+          testBtn.disabled = false;
+        });
+        
+        socket.on('error', function(error) {
+          log(`Socket error: ${error}`, 'error');
+        });
+        
+        socket.on('disconnect', function(reason) {
+          log(`Disconnected: ${reason}`);
+        });
+      } catch (error) {
+        log(`Exception during test: ${error.message}`, 'error');
+        
+        statusDiv.className = 'result error';
+        statusDiv.innerHTML = '<strong>EXCEPTION!</strong> An error occurred while setting up the connection.<br>' +
+                             'Error: ' + error.message;
+        
+        testBtn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>
