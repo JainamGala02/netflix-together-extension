@@ -139,6 +139,9 @@ async function injectOverlay(roomCode, isHost) {
     
     // Add diagnostics buttons right away for easier debugging
     addDiagnosticsAndFixButtons();
+    
+    // NEW: Add emergency chat button
+    addEmergencyChatButton();
   } catch (error) {
     console.error('Error injecting overlay:', error);
     const errorDiv = document.createElement('div');
@@ -308,8 +311,383 @@ function initializeOverlayUI() {
     remoteVideo.setAttribute('playsinline', '');
     remoteVideo.setAttribute('autoplay', '');
   }
-  
+  enhanceInitializeUI();
+  fixChatButton(); // ENHANCED VERSION
   console.log('UI initialization complete');
+}
+
+// ENHANCED: Completely rewritten chat button fix function
+function fixChatButton() {
+  console.log('Applying comprehensive chat button fix');
+  const chatToggleBtn = document.getElementById('chat-toggle');
+  const chatContainer = document.getElementById('chat-container');
+  
+  if (!chatToggleBtn || !chatContainer) {
+    console.error('Could not find chat elements to fix');
+    return;
+  }
+  
+  console.log('Chat container initial state:', {
+    hidden: chatContainer.classList.contains('hidden'),
+    display: window.getComputedStyle(chatContainer).display,
+    visibility: window.getComputedStyle(chatContainer).visibility,
+    opacity: window.getComputedStyle(chatContainer).opacity
+  });
+  
+  // Remove all existing click handlers by cloning the element
+  const newChatToggleBtn = chatToggleBtn.cloneNode(true);
+  chatToggleBtn.parentNode.replaceChild(newChatToggleBtn, chatToggleBtn);
+  
+  // Add fresh event listener with enhanced visibility handling
+  newChatToggleBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    console.log('Chat toggle clicked - comprehensive handler');
+    
+    // Force the chat container to be visible and properly styled
+    if (chatContainer.classList.contains('hidden')) {
+      console.log('Showing chat container');
+      chatContainer.classList.remove('hidden');
+      newChatToggleBtn.classList.add('active');
+      
+      // ENHANCED: Force proper styling to ensure visibility
+      chatContainer.style.display = 'flex';
+      chatContainer.style.visibility = 'visible';
+      chatContainer.style.opacity = '1';
+      chatContainer.style.transform = 'none';
+      chatContainer.style.pointerEvents = 'auto';
+      chatContainer.style.zIndex = '99999';
+      
+      // Focus the input when opened
+      setTimeout(() => {
+        const input = document.getElementById('message-input');
+        if (input) input.focus();
+        
+        // Log the state after showing
+        console.log('Chat container shown state:', {
+          hidden: chatContainer.classList.contains('hidden'),
+          display: window.getComputedStyle(chatContainer).display,
+          visibility: window.getComputedStyle(chatContainer).visibility,
+          opacity: window.getComputedStyle(chatContainer).opacity,
+          transform: window.getComputedStyle(chatContainer).transform
+        });
+      }, 100);
+    } else {
+      console.log('Hiding chat container');
+      chatContainer.classList.add('hidden');
+      newChatToggleBtn.classList.remove('active');
+    }
+  });
+  
+  // Also fix minimize button
+  const minimizeBtn = document.getElementById('minimize-chat');
+  if (minimizeBtn) {
+    // Remove existing handlers
+    const newMinimizeBtn = minimizeBtn.cloneNode(true);
+    minimizeBtn.parentNode.replaceChild(newMinimizeBtn, minimizeBtn);
+    
+    // Add fresh handler
+    newMinimizeBtn.addEventListener('click', function() {
+      console.log('Minimize chat clicked');
+      chatContainer.classList.add('hidden');
+      newChatToggleBtn.classList.remove('active');
+    });
+  }
+  
+  // Add a test message to confirm chat is working
+  const messagesContainer = document.getElementById('messages-container');
+  if (messagesContainer) {
+    const testMsg = document.createElement('div');
+    testMsg.className = 'system-message';
+    testMsg.textContent = 'Chat is now working! Click the chat icon (top-right) to toggle.';
+    messagesContainer.appendChild(testMsg);
+    
+    // Auto-scroll to bottom
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  }
+  
+  // ENHANCED: Add global toggle function for emergency access
+  window.toggleNetflixTogetherChat = function() {
+    console.log('EMERGENCY CHAT TOGGLE');
+    if (chatContainer.classList.contains('hidden')) {
+      chatContainer.classList.remove('hidden');
+      chatContainer.style.display = 'flex';
+      chatContainer.style.transform = 'none';
+      chatContainer.style.opacity = '1';
+      chatContainer.style.visibility = 'visible';
+      chatContainer.style.pointerEvents = 'auto';
+      chatContainer.style.zIndex = '99999';
+      return 'Chat shown';
+    } else {
+      chatContainer.classList.add('hidden');
+      return 'Chat hidden';
+    }
+  };
+  
+  console.log('Comprehensive chat button fix applied');
+}
+
+// NEW: Add emergency chat button function
+function addEmergencyChatButton() {
+  const emergencyBtn = document.createElement('button');
+  emergencyBtn.textContent = "Show Chat";
+  emergencyBtn.style = "position:fixed; top:250px; left:10px; z-index:99999; background:#e50914; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer;";
+  emergencyBtn.onclick = function() {
+    const chatContainer = document.getElementById('chat-container');
+    if (chatContainer) {
+      if (chatContainer.classList.contains('hidden')) {
+        chatContainer.classList.remove('hidden');
+        chatContainer.style.display = 'flex';
+        chatContainer.style.transform = 'none';
+        chatContainer.style.opacity = '1';
+        chatContainer.style.visibility = 'visible';
+        chatContainer.style.zIndex = '99999';
+        this.textContent = "Hide Chat";
+      } else {
+        chatContainer.classList.add('hidden');
+        this.textContent = "Show Chat";
+      }
+    } else {
+      console.error('Chat container not found');
+      alert('Chat container not found. Please refresh the page.');
+    }
+  };
+  document.body.appendChild(emergencyBtn);
+}
+
+function makeDraggable(element, handleElement) {
+  if (!element) return;
+  
+  const handle = handleElement || element;
+  let isDragging = false;
+  let startX, startY, initialLeft, initialTop;
+
+  // Initialize position if not already set
+  if (!element.style.left && !element.style.right) {
+    if (element.classList.contains('video-container')) {
+      // Start video container at top right
+      element.style.top = '60px';
+      element.style.right = '10px';
+      element.style.left = 'auto';
+    } else if (element.classList.contains('chat-container')) {
+      // Start chat at bottom right
+      element.style.bottom = '10px';
+      element.style.right = '10px';
+      element.style.left = 'auto';
+    }
+  }
+  
+  handle.addEventListener('mousedown', startDrag);
+  
+  function startDrag(e) {
+    // Prevent default to avoid text selection during drag
+    e.preventDefault();
+    
+    // For chat header, we only want to drag when clicking the header itself, not its buttons
+    if (handle.classList.contains('chat-header') && e.target.tagName === 'BUTTON') {
+      return;
+    }
+    
+    isDragging = true;
+    
+    // Get initial positions
+    startX = e.clientX;
+    startY = e.clientY;
+    
+    // Convert right/bottom positioning to left/top if needed
+    if (element.style.right && element.style.right !== 'auto') {
+      const rect = element.getBoundingClientRect();
+      element.style.left = (window.innerWidth - rect.right) + 'px';
+      element.style.right = 'auto';
+    }
+    
+    if (element.style.bottom && element.style.bottom !== 'auto') {
+      const rect = element.getBoundingClientRect();
+      element.style.top = (window.innerHeight - rect.bottom) + 'px';
+      element.style.bottom = 'auto';
+    }
+    
+    initialLeft = element.style.left ? parseInt(element.style.left) : 0;
+    initialTop = element.style.top ? parseInt(element.style.top) : 0;
+    
+    // Add dragging class
+    element.classList.add('dragging');
+    
+    // Add event listeners for drag and end
+    document.addEventListener('mousemove', doDrag);
+    document.addEventListener('mouseup', stopDrag);
+  }
+  
+  function doDrag(e) {
+    if (!isDragging) return;
+    
+    // Calculate new position
+    const newLeft = initialLeft + (e.clientX - startX);
+    const newTop = initialTop + (e.clientY - startY);
+    
+    // Set new position
+    element.style.left = newLeft + 'px';
+    element.style.top = newTop + 'px';
+  }
+  
+  function stopDrag() {
+    if (!isDragging) return;
+    
+    isDragging = false;
+    element.classList.remove('dragging');
+    
+    // Remove event listeners
+    document.removeEventListener('mousemove', doDrag);
+    document.removeEventListener('mouseup', stopDrag);
+  }
+}
+
+// Setup for draggable elements
+function setupDraggableElements() {
+  console.log('Setting up draggable elements');
+  
+  // Make video container draggable
+  const videoContainer = document.querySelector('.video-container');
+  if (videoContainer) {
+    makeDraggable(videoContainer);
+  }
+  
+  // Make chat container draggable by its header
+  const chatContainer = document.getElementById('chat-container');
+  const chatHeader = document.querySelector('.chat-header');
+  
+  if (chatContainer && chatHeader) {
+    makeDraggable(chatContainer, chatHeader);
+  }
+}
+
+// Improved chat toggle functionality
+function setupChatToggle() {
+  const chatToggleBtn = document.getElementById('chat-toggle');
+  const chatContainer = document.getElementById('chat-container');
+  const minimizeBtn = document.getElementById('minimize-chat');
+  
+  if (!chatToggleBtn || !chatContainer) return;
+  
+  // Add active state tracking
+  chatToggleBtn.addEventListener('click', () => {
+    const isHidden = chatContainer.classList.contains('hidden');
+    
+    // Toggle the hidden class
+    chatContainer.classList.toggle('hidden');
+    
+    // Toggle the active class on the button
+    if (isHidden) {
+      chatToggleBtn.classList.add('active');
+      // Focus the input when opened
+      setTimeout(() => {
+        const input = document.getElementById('message-input');
+        if (input) input.focus();
+      }, 100);
+    } else {
+      chatToggleBtn.classList.remove('active');
+    }
+  });
+  
+  // Make minimize button work
+  if (minimizeBtn) {
+    minimizeBtn.addEventListener('click', () => {
+      chatContainer.classList.add('hidden');
+      chatToggleBtn.classList.remove('active');
+    });
+  }
+  
+  // Click outside to close (but not when clicking inside the chat)
+  document.addEventListener('mousedown', (event) => {
+    // Only proceed if chat is visible and click is outside
+    if (!chatContainer.classList.contains('hidden') && 
+        !chatContainer.contains(event.target) && 
+        !chatToggleBtn.contains(event.target)) {
+      chatContainer.classList.add('hidden');
+      chatToggleBtn.classList.remove('active');
+    }
+  });
+}
+
+// Toggle button active states
+function setupToggleButtonStates() {
+  const micToggleBtn = document.getElementById('mic-toggle');
+  const cameraToggleBtn = document.getElementById('camera-toggle');
+  
+  // Initialize mic button active state based on settings
+  if (micToggleBtn) {
+    chrome.storage.local.get('userSettings', (data) => {
+      const settings = data.userSettings || {};
+      if (settings.micEnabled !== false) {
+        micToggleBtn.classList.add('active');
+      }
+    });
+  }
+  
+  // Initialize camera button active state based on settings
+  if (cameraToggleBtn) {
+    chrome.storage.local.get('userSettings', (data) => {
+      const settings = data.userSettings || {};
+      if (settings.cameraEnabled !== false) {
+        cameraToggleBtn.classList.add('active');
+      }
+    });
+  }
+}
+
+// Add tooltip functionality
+function setupTooltips() {
+  const tooltip = document.getElementById('tooltip');
+  if (!tooltip) return;
+  
+  const elements = document.querySelectorAll('[data-tooltip]');
+  
+  elements.forEach(el => {
+    el.addEventListener('mouseenter', (e) => {
+      const text = el.getAttribute('data-tooltip');
+      tooltip.textContent = text;
+      tooltip.style.opacity = 1;
+      
+      // Position tooltip
+      const rect = el.getBoundingClientRect();
+      tooltip.style.top = (rect.top - 30) + 'px';
+      tooltip.style.left = (rect.left + rect.width/2 - tooltip.offsetWidth/2) + 'px';
+    });
+    
+    el.addEventListener('mouseleave', () => {
+      tooltip.style.opacity = 0;
+    });
+  });
+}
+
+// ENHANCED: Modified to prioritize the fixed chat button
+function enhanceInitializeUI() {
+  // Only call setupChatToggle() if we haven't fixed the chat button already
+  if (!window.chatFixApplied) {
+    fixChatButton();
+    window.chatFixApplied = true;
+  } else {
+    console.log('Chat fix already applied, skipping setupChatToggle()');
+  }
+  
+  setupToggleButtonStates();
+  setupDraggableElements();
+  setupTooltips();
+  
+  // Show a notification
+  showNotification('You can drag the video and chat windows anywhere on the screen!');
+}
+
+// Helper function to show notifications
+function showNotification(message) {
+  const notification = document.createElement('div');
+  notification.className = 'notification';
+  notification.textContent = message;
+  document.body.appendChild(notification);
+  
+  // Remove after animation (3 seconds)
+  setTimeout(() => {
+    notification.remove();
+  }, 3000);
 }
 
 // Set up event listeners for communication from page script
@@ -1165,6 +1543,9 @@ function toggleMicrophone() {
       micToggleBtn.innerHTML = enabled 
         ? '<i class="fas fa-microphone"></i>' 
         : '<i class="fas fa-microphone-slash"></i>';
+      
+      // Toggle active state
+      micToggleBtn.classList.toggle('active', enabled);
     }
     
     // Update settings
@@ -1198,6 +1579,9 @@ function toggleCamera() {
       cameraToggleBtn.innerHTML = enabled 
         ? '<i class="fas fa-video"></i>' 
         : '<i class="fas fa-video-slash"></i>';
+      
+      // Toggle active state
+      cameraToggleBtn.classList.toggle('active', enabled);
     }
     
     // Update camera indicator in local video

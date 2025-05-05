@@ -1,22 +1,74 @@
-<!-- This is the HTML for the overlay with improved video attributes -->
+<!-- Modified overlay.html with improved chat handling -->
 <!DOCTYPE html>
 <html>
 <head>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+  <style>
+    /* Minimal inline styles for faster loading */
+    #tooltip {
+      position: fixed;
+      background-color: rgba(0,0,0,0.8);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      pointer-events: none;
+      z-index: 10002;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    /* ENHANCED: Direct styles for chat container to ensure visibility */
+    #chat-container {
+      position: fixed !important;
+      right: 10px !important;
+      bottom: 10px !important;
+      width: 300px !important;
+      height: 400px !important;
+      background-color: rgba(0, 0, 0, 0.9) !important;
+      border-radius: 10px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      z-index: 99999 !important;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7) !important;
+    }
+    
+    /* When initially hidden - use transform instead of display:none */
+    #chat-container.hidden {
+      transform: translateX(310px) !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+    
+    /* Emergency button styles */
+    #emergency-chat-toggle {
+      position: fixed;
+      top: 210px;
+      left: 10px;
+      z-index: 99999;
+      background: #e50914;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
   <!-- Control Bar -->
   <div class="control-bar">
-    <button id="mic-toggle" class="control-button">
+    <button id="mic-toggle" class="control-button" data-tooltip="Toggle Microphone">
       <i class="fas fa-microphone"></i>
     </button>
-    <button id="camera-toggle" class="control-button">
+    <button id="camera-toggle" class="control-button" data-tooltip="Toggle Camera">
       <i class="fas fa-video"></i>
     </button>
-    <button id="chat-toggle" class="control-button">
+    <button id="chat-toggle" class="control-button" data-tooltip="Toggle Chat">
       <i class="fas fa-comment"></i>
     </button>
-    <button id="close-overlay" class="control-button">
+    <button id="close-overlay" class="control-button" data-tooltip="End Session">
       <i class="fas fa-times"></i>
     </button>
     <div class="room-code">Room: <span id="room-code">------</span></div>
@@ -25,22 +77,20 @@
   <!-- Video Container -->
   <div class="video-container">
     <div class="video-wrapper">
-      <!-- FIXED: Added playsinline attribute and improved video attributes -->
       <video id="local-video" autoplay muted playsinline></video>
       <div class="video-label">You</div>
     </div>
     <div class="video-wrapper">
-      <!-- FIXED: Added playsinline attribute and preload attribute -->
       <video id="remote-video" autoplay playsinline preload="auto"></video>
       <div class="video-label">Partner</div>
     </div>
   </div>
   
-  <!-- Chat Container -->
-  <div id="chat-container" class="chat-container hidden">
+  <!-- ENHANCED: Chat Container with better visibility and styles -->
+  <div id="chat-container" class="chat-container hidden"> 
     <div class="chat-header">
       <h3>Chat</h3>
-      <button id="minimize-chat" class="control-button">
+      <button id="minimize-chat" class="control-button" data-tooltip="Minimize Chat">
         <i class="fas fa-minus"></i>
       </button>
     </div>
@@ -57,13 +107,65 @@
     </div>
   </div>
   
-  <!-- Debug Controls (now visible by default for easier troubleshooting) -->
-  <button id="netflix-together-debug" style="position:fixed; top:90px; left:10px; z-index:10001; background:#333; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer;">Debug WebRTC</button>
+  <!-- Debug Controls -->
+  <button id="netflix-together-debug" style="position:fixed; top:90px; left:10px; z-index:10001; background:#333; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer;" data-tooltip="Debug WebRTC Connection">Debug WebRTC</button>
   
-  <!-- Connection Status Indicator - Added for better visibility -->
-  <div id="connection-status" class="connection-status" style="position:fixed; top:10px; left:10px; background:rgba(0,0,0,0.7); color:white; padding:5px 10px; border-radius:4px; z-index:10000;">
+  <!-- ENHANCED: Emergency chat toggle button with improved visibility -->
+  <button id="emergency-chat-toggle">Show Chat</button>
+  
+  <!-- Connection Status Indicator -->
+  <div id="connection-status" class="connection-status">
     <div class="status-dot connecting"></div>
     <span>Initializing...</span>
   </div>
+  
+  <!-- Tooltip element -->
+  <div id="tooltip"></div>
+  
+  <script>
+    // Tooltip functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const tooltip = document.getElementById('tooltip');
+      const elements = document.querySelectorAll('[data-tooltip]');
+      
+      elements.forEach(el => {
+        el.addEventListener('mouseenter', (e) => {
+          const text = el.getAttribute('data-tooltip');
+          tooltip.textContent = text;
+          tooltip.style.opacity = 1;
+          
+          // Position tooltip
+          const rect = el.getBoundingClientRect();
+          tooltip.style.top = (rect.top - 30) + 'px';
+          tooltip.style.left = (rect.left + rect.width/2 - tooltip.offsetWidth/2) + 'px';
+        });
+        
+        el.addEventListener('mouseleave', () => {
+          tooltip.style.opacity = 0;
+        });
+      });
+      
+      // ENHANCED: Direct chat toggle functionality
+      const emergencyBtn = document.getElementById('emergency-chat-toggle');
+      const chatContainer = document.getElementById('chat-container');
+      
+      if (emergencyBtn && chatContainer) {
+        emergencyBtn.addEventListener('click', function() {
+          if (chatContainer.classList.contains('hidden')) {
+            chatContainer.classList.remove('hidden');
+            chatContainer.style.display = 'flex';
+            chatContainer.style.transform = 'none';
+            chatContainer.style.opacity = '1';
+            chatContainer.style.visibility = 'visible';
+            chatContainer.style.zIndex = '99999';
+            emergencyBtn.textContent = 'Hide Chat';
+          } else {
+            chatContainer.classList.add('hidden');
+            emergencyBtn.textContent = 'Show Chat';
+          }
+        });
+      }
+    });
+  </script>
 </body>
 </html>
